@@ -1,31 +1,41 @@
+const SPEED_COEF = 2;
+const STAR_WIDTH = 2;
+const STARS_COUNT = 100;
+const STAR_COLOR = 'white';
+const SHADOW = 'rgba(0, 0, 8, .1)';
+
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
 const w = canvas.width = window.innerWidth;
 const h = canvas.height = window.innerHeight;
-const random = n=>Math.random()*n;
-const stars = new Array(100).fill(null).map(()=>({r: random(w), s: random(2), a: random(Math.PI*2)}));
+const stars = new Array(STARS_COUNT).fill(null).map(() => ({
+  y: 0,
+  x: Math.random() * w,
+  speed: Math.random() * SPEED_COEF,
+}));
 
-requestAnimationFrame(loop);
-
-window.addEventListener('resize', ()=>{
+window.addEventListener('resize', () => {
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
-})
+});
 
-function loop() {
-  ctx.fillStyle = 'rgba(0,0,8,.1)';
-  ctx.fillRect(0,0,w,h);
-  stars.forEach(e=>{
-    if(e.a >= h) {
-      e.a = 0;
+(function moveStars() {
+  ctx.fillStyle = SHADOW;
+  ctx.fillRect(0, 0, w, h);
+
+  stars.forEach((s) => {
+    if(s.y >= h) {
+      s.y = 0;
     } else {
-      e.a+= e.s;
+      s.y+= s.speed;
     }
+
     ctx.beginPath();
-    ctx.rect(e.r, e.a, 2, 2);
+    ctx.rect(s.x, s.y, STAR_WIDTH, STAR_WIDTH);
     ctx.closePath();
-    ctx.fillStyle = 'white';
-    ctx.fill();
-  })
-  requestAnimationFrame(loop);
-}
+    ctx.strokeStyle = STAR_COLOR;
+    ctx.stroke();
+  });
+
+  requestAnimationFrame(moveStars);
+})();
